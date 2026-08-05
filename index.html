@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional AI Banner Prompt Generator</title>
+    <!-- Tailwind CSS for modern responsive design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for professional icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .mono-font { font-family: 'JetBrains Mono', monospace; }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-amber-500 to-red-600 p-2.5 rounded-xl shadow-lg shadow-amber-500/20 text-slate-950 font-bold text-xl">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        BannerPrompt Pro <span class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full font-medium">v2.4 AI Engine</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Builder Prompt AI Standar Industri Cetak & Digital</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <button onclick="loadPreset('kuliner')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-utensils text-amber-400"></i> Preset Kuliner
+                </button>
+                <button onclick="loadPreset('event')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-calendar-star text-red-400"></i> Preset Event
+                </button>
+                <button onclick="resetForm()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Column: Controls & Inputs (7 cols) -->
+        <section class="lg:col-span-7 space-y-6">
+            
+            <!-- Card 1: Spesifikasi Ukuran & Resolusi -->
+            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 shadow-xl backdrop-blur">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-2">
+                        <i class="fa-solid fa-ruler-combined"></i> 1. Spesifikasi Fisik, Tipe & Resolusi Kerja
+                    </h2>
+                    <span class="text-xs text-slate-400">Otomatis Terkalkulasi</span>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Pilihan Tipe Produk</label>
+                        <select id="productType" onchange="generatePrompt()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition">
+                            <option value="Banner" selected>Banner / Spanduk</option>
+                            <option value="Sticker">Sticker / Label</option>
+                            <option value="Flyer">Flyer / Brosur</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Bentuk Model Gambar (Shape)</label>
+                        <select id="imageShape" onchange="generatePrompt()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition">
+                            <option value="Kotak (Rectangle / Square)" selected>Kotak (Rectangle / Square)</option>
+                            <option value="Bulat (Circle / Die-cut)">Bulat (Circle / Die-cut)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Ukuran Fisik Final (cm)</label>
+                        <div class="flex gap-2">
+                            <div class="relative flex-1">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs text-slate-500">Lebar</span>
+                                <input type="number" id="physicalWidth" value="50" oninput="updateCalculations()" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-14 pr-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition">
+                            </div>
+                            <span class="self-center text-slate-500 font-bold">x</span>
+                            <div class="relative flex-1">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs text-slate-500">Tinggi</span>
+                                <input type="number" id="physicalHeight" value="100" oninput="updateCalculations()" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-14 pr-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Resolusi Cetak (DPI)</label>
+                        <select id="printDpi" onchange="updateCalculations()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition">
+                            <option value="300" selected>300 DPI (High Quality Print)</option>
+                            <option value="150">150 DPI (Standard Print)</option>
+                            <option value="72">72 DPI (Digital Screen)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Skala Kerja AI (Multiplier)</label>
+                        <select id="aiScale" onchange="updateCalculations()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition">
+                            <option value="0.5" selected>0.5x AI Canvas</option>
+                            <option value="1.0">1.0x Full Res</option>
+                            <option value="0.25">0.25x Compact</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Aspect Ratio Terkunci (Otomatis)</label>
+                        <input type="text" id="aspectRatio" value="1:2" readonly class="w-full bg-slate-950/50 border border-slate-800/80 rounded-xl px-3 py-2 text-sm text-amber-400 font-mono cursor-not-allowed">
+                    </div>
+                </div>
+
+                <!-- Info Box Kalkulasi -->
+                <div class="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-300/90 flex flex-col gap-1">
+                    <div class="font-semibold flex items-center gap-1.5"><i class="fa-solid fa-circle-info"></i> Kalkulasi Otomatis AI:</div>
+                    <div id="calcSummaryText" class="mono-font text-amber-200/80">Format PNG HD | Ukuran: 50x100 cm | Cetak: 5906 x 11811 px @300 DPI | Canvas AI: 2880 x 5760 px</div>
+                </div>
+            </div>
+
+            <!-- Card 2: Warna & Mood -->
+            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 shadow-xl backdrop-blur">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-2">
+                        <i class="fa-solid fa-palette"></i> 2. Palet Warna & Mood Design
+                    </h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Warna Dominan</label>
+                        <input type="text" id="dominantColor" value="Kuning" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition" placeholder="Contoh: Kuning cerah">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Warna Sekunder / Aksen</label>
+                        <input type="text" id="secondaryColor" value="Merah, hitam" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition" placeholder="Contoh: Merah, hitam">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Mood Warna (Pilih / Kustom)</label>
+                        <select id="colorMoodSelect" onchange="handleMoodSelectChange()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition mb-2">
+                            <option value="Cerah" selected>Cerah (Energik & Mencolok)</option>
+                            <option value="Eksklusif & Profesional">Eksklusif & Profesional</option>
+                            <option value="Hangat & Menggugah Selera">Hangat & Menggugah Selera (Warm & Appetizing)</option>
+                            <option value="Minimalis Elegan">Minimalis Elegan</option>
+                            <option value="Neon Cyberpunk">Neon Cyberpunk</option>
+                            <option value="custom">-- Tulis Kustom Sendiri --</option>
+                        </select>
+                        <input type="text" id="colorMood" value="Cerah" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition hidden" placeholder="Tulis mood warna...">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Gaya Design (Pilih / Kustom)</label>
+                        <select id="designStyleSelect" onchange="handleDesignStyleSelectChange()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition mb-2">
+                            <option value="Food Promotion Style" selected>Food Promotion Style (Komersial Kuliner)</option>
+                            <option value="Modern Corporate Event Style">Modern Corporate Event Style</option>
+                            <option value="Bold Typography Streetwear Banner">Bold Typography Streetwear Banner</option>
+                            <option value="Minimalist Clean Sale Banner">Minimalist Clean Sale Banner</option>
+                            <option value="Traditional Authentic Culinary Banner">Traditional Authentic Culinary Banner</option>
+                            <option value="custom">-- Tulis Kustom Sendiri --</option>
+                        </select>
+                        <input type="text" id="designStyle" value="Food Promotion Style" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition hidden" placeholder="Tulis gaya design...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Teks & Tipografi -->
+            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 shadow-xl backdrop-blur">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-2">
+                        <i class="fa-solid fa-font"></i> 3. Konfigurasi Teks & Posisi
+                    </h2>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Teks Utama / Judul (Pisahkan dengan koma)</label>
+                            <input type="text" id="mainText" value="NASI PECEL, SAMBELAN" oninput="generatePrompt()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Warna Teks Utama</label>
+                            <input type="text" id="textColor" value="Merah" oninput="generatePrompt()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition">
+                        </div>
+                    </div>
+
+                    <!-- Stream Chunk: Secondary text / sub title configuration -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-800/50">
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Teks Sekunder / Sub Judul</label>
+                            <input type="text" id="secondaryText" value="" oninput="generatePrompt()" placeholder="Contoh: Enak, Gurih, & Mantap" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Warna Teks Sekunder</label>
+                            <input type="text" id="secondaryTextColor" value="Putih" oninput="generatePrompt()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-800/50">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Peletakan Teks Utama</label>
+                            <input type="text" id="textPosition" value="Tengah, Atas" oninput="generatePrompt()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Peletakan Teks Sekunder</label>
+                            <input type="text" id="secondaryTextPosition" value="Di bawah teks utama" oninput="generatePrompt()" placeholder="Contoh: Di bawah teks utama" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Gaya Font (Pilih / Kustom)</label>
+                            <select id="fontStyleSelect" onchange="handleFontStyleSelectChange()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition mb-1">
+                                <option value="Tebal Modern" selected>Tebal Modern (Modern Bold Sans-Serif)</option>
+                                <option value="Futuristic Sans-Serif">Futuristic Sans-Serif</option>
+                                <option value="Classic Elegance Serif">Classic Elegance Serif</option>
+                                <option value="Playful Bubble Font">Playful Bubble Font</option>
+                                <option value="Heavy Impact Display Font">Heavy Impact Display Font</option>
+                                <option value="custom">-- Tulis Kustom Sendiri --</option>
+                            </select>
+                            <input type="text" id="fontStyle" value="Tebal Modern" oninput="generatePrompt()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition hidden" placeholder="Tulis gaya font...">
+                        </div>
+                    </div>
+
+                    <!-- Card 3.1: Menu & Harga Item (Opsional) -->
+                    <div class="pt-3 border-t border-slate-800/80">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-xs font-medium text-amber-400 flex items-center gap-1.5">
+                                <i class="fa-solid fa-list-check"></i> Form Daftar Menu (Harga Opsional)
+                            </label>
+                            <button onclick="addMenuItem()" type="button" class="text-xs bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 px-2.5 py-1 rounded-lg border border-amber-500/40 transition flex items-center gap-1">
+                                <i class="fa-solid fa-plus"></i> Tambah Menu
+                            </button>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-3">Kolom harga bersifat opsional (bisa dikosongkan jika hanya ingin menampilkan nama menu).</p>
+                        
+                        <div id="menuItemsContainer" class="space-y-2 mb-3">
+                            <div class="flex gap-2 items-center menu-item-row">
+                                <input type="text" placeholder="Nama Menu (Contoh: Nasi Pecel Special)" class="menu-name flex-[3] w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-amber-500" value="Nasi Pecel Special" oninput="generatePrompt()">
+                                <input type="text" placeholder="Harga (Opsional, cth: Rp 15.000)" class="menu-price flex-[2] w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-amber-500" value="Rp 15.000" oninput="generatePrompt()">
+                                <button onclick="removeMenuItem(this)" type="button" class="text-slate-500 hover:text-red-400 p-2"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between bg-slate-950 px-4 py-3 rounded-xl border border-slate-800">
+                            <span class="text-xs text-slate-300 font-medium">Sertakan List Menu dalam Prompt AI</span>
+                            <input type="checkbox" id="includeMenuList" onchange="generatePrompt()" class="w-4 h-4 accent-amber-500 rounded cursor-pointer">
+                        </div>
+                    </div>
+
+                    <!-- Card 3.2: Informasi Kontak, Sosmed (Alamat, Telepon, Instagram, Facebook) -->
+                    <div class="pt-3 border-t border-slate-800/80">
+                        <label class="block text-xs font-medium text-amber-400 mb-1 flex items-center gap-1.5">
+                            <i class="fa-solid fa-address-card"></i> Informasi Kontak & Sosmed (Opsional)
+                        </label>
+                        <p class="text-xs text-slate-400 mb-3">Tambahkan alamat, telepon, Instagram, dan Facebook untuk ditampilkan di bagian bawah banner.</p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] text-slate-400 mb-1"><i class="fa-solid fa-location-dot text-amber-400"></i> Alamat / Lokasi</label>
+                                <input type="text" id="contactAddress" oninput="generatePrompt()" placeholder="Contoh: Jl. Merdeka No. 45" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-amber-500 transition" value="">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-slate-400 mb-1"><i class="fa-solid fa-phone text-emerald-400"></i> Telepon / WhatsApp</label>
+                                <input type="text" id="contactPhone" oninput="generatePrompt()" placeholder="Contoh: 0812-3456-7890" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-amber-500 transition" value="">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-slate-400 mb-1"><i class="fa-brands fa-instagram text-pink-400"></i> Instagram</label>
+                                <input type="text" id="contactIg" oninput="generatePrompt()" placeholder="Contoh: @nasipecel_official" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-amber-500 transition" value="">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-slate-400 mb-1"><i class="fa-brands fa-facebook text-blue-400"></i> Facebook</label>
+                                <input type="text" id="contactFb" oninput="generatePrompt()" placeholder="Contoh: Nasi Pecel Nusantara" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-amber-500 transition" value="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-800/50">
+                        <div class="flex items-center justify-between bg-slate-950 px-4 py-3 rounded-xl border border-slate-800">
+                            <span class="text-xs text-slate-300">Strict: Dilarang Teks Lain</span>
+                            <input type="checkbox" id="strictNoOtherText" checked class="w-4 h-4 accent-amber-500 rounded cursor-pointer" onchange="generatePrompt()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Elemen Visual & Constraints -->
+            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 shadow-xl backdrop-blur">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-2">
+                        <i class="fa-solid fa-image"></i> 4. Elemen Visual & Gambar Referensi
+                    </h2>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Pilihan Mode Penambahan AI</label>
+                        <select id="aiFocusMode" onchange="generatePrompt()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition">
+                            <option value="balanced" selected>Seimbang (Gambar Objek & Teks Promosi)</option>
+                            <option value="image_focus">Fokus Utama pada Gambar / Ilustrasi Objek</option>
+                            <option value="text_focus">Fokus Utama pada Kejelasan Teks & Tipografi</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="flex items-center justify-between bg-slate-950 px-4 py-2 mt-auto rounded-xl border border-slate-800 h-[38px] sm:col-span-2">
+                            <span class="text-xs text-slate-300 font-medium truncate pr-2">Strict: Dilarang Gambar AI</span>
+                            <input type="checkbox" id="strictNoAiImage" onchange="generatePrompt()" class="w-4 h-4 accent-amber-500 rounded cursor-pointer shrink-0">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Deskripsi Objek / Gambar Utama</label>
+                        <textarea id="visualObjects" rows="2" oninput="generatePrompt()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition">tambahkan gambar nasi pecel dan sambelan dalam kemasan cup di bagian tengah, bawah. Gambar Jangan terlalu besar, jangan lebih besar dari teks utama</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Keywords Kualitas Tambahan (Booster)</label>
+                        <textarea id="qualityKeywords" rows="2" oninput="generatePrompt()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500 transition">Ultra HD 8K, highly detailed, sharp focus, crisp typography, clean vector-like edges, professional print quality, high contrast, ultra sharp details, readable text, no blur, no distorted text, clean composition, no messy elements, print-ready quality.</textarea>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Right Column: Output Prompt Preview & Generator (5 cols) -->
+        <section class="lg:col-span-5 flex flex-col gap-6">
+            
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-2xl backdrop-blur sticky top-24 flex flex-col h-[calc(100vh-7rem)]">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                        <i class="fa-solid fa-terminal"></i> Hasil Prompt AI Final
+                    </h2>
+                    <span id="charCount" class="text-xs text-slate-400 mono-font">0 karakter</span>
+                </div>
+
+                <!-- Prompt Output Box -->
+                <div class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-4 mb-4 overflow-y-auto relative group">
+                    <pre id="outputPromptText" class="mono-font text-xs text-slate-300 whitespace-pre-wrap leading-relaxed">Menyiapkan prompt...</pre>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="space-y-3">
+                    <button onclick="generatePrompt()" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-bold py-3 px-4 rounded-xl shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Regenerate / Susun Ulang Prompt
+                    </button>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="copyPrompt()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-2.5 px-4 rounded-xl border border-slate-700 transition flex items-center justify-center gap-2 text-xs">
+                            <i class="fa-solid fa-copy text-amber-400"></i> Salin Prompt
+                        </button>
+                        <button onclick="downloadPrompt()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-2.5 px-4 rounded-xl border border-slate-700 transition flex items-center justify-center gap-2 text-xs">
+                            <i class="fa-solid fa-download text-emerald-400"></i> Simpan .TXT
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Notifikasi Toast Sukses -->
+                <div id="toast" class="opacity-0 pointer-events-none transition-opacity duration-300 absolute bottom-24 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-xs px-4 py-2 rounded-xl shadow-xl flex items-center gap-2">
+                    <i class="fa-solid fa-check-circle"></i> Prompt berhasil disalin ke clipboard!
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-slate-800 bg-slate-900/90 py-6 px-4 text-center">
+        <div class="max-w-xl mx-auto flex flex-col items-center justify-center gap-1">
+            <p class="text-[11px] text-slate-500">&copy; 2026 BannerPrompt Pro v2.4. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Handler Dropdown Mood Warna
+        function handleMoodSelectChange() {
+            const select = document.getElementById('colorMoodSelect');
+            const input = document.getElementById('colorMood');
+            if (select.value === 'custom') {
+                input.classList.remove('hidden');
+                input.focus();
+                input.value = '';
+            } else {
+                input.classList.add('hidden');
+                input.value = select.value;
+            }
+            generatePrompt();
+        }
+
+        // Handler Dropdown Gaya Desain
+        function handleDesignStyleSelectChange() {
+            const select = document.getElementById('designStyleSelect');
+            const input = document.getElementById('designStyle');
+            if (select.value === 'custom') {
+                input.classList.remove('hidden');
+                input.focus();
+                input.value = '';
+            } else {
+                input.classList.add('hidden');
+                input.value = select.value;
+            }
+            generatePrompt();
+        }
+
+        // Handler Dropdown Gaya Font
+        function handleFontStyleSelectChange() {
+            const select = document.getElementById('fontStyleSelect');
+            const input = document.getElementById('fontStyle');
+            if (select.value === 'custom') {
+                input.classList.remove('hidden');
+                input.focus();
+                input.value = '';
+            } else {
+                input.classList.add('hidden');
+                input.value = select.value;
+            }
+            generatePrompt();
+        }
+
+        // Manajemen Menu & Harga Dinamis
+        function addMenuItem(name = '', price = '') {
+            const container = document.getElementById('menuItemsContainer');
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 items-center menu-item-row';
+            div.innerHTML = `
+                <input type="text" placeholder="Nama Menu (Contoh: Nasi Pecel Special)" class="menu-name flex-[3] w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-amber-500" value="${name}" oninput="generatePrompt()">
+                <input type="text" placeholder="Harga (Opsional, cth: Rp 15.000)" class="menu-price flex-[2] w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-amber-500" value="${price}" oninput="generatePrompt()">
+                <button onclick="removeMenuItem(this)" type="button" class="text-slate-500 hover:text-red-400 p-2"><i class="fa-solid fa-trash"></i></button>
+            `;
+            container.appendChild(div);
+            generatePrompt();
+        }
+
+        function removeMenuItem(btn) {
+            btn.closest('.menu-item-row').remove();
+            generatePrompt();
+        }
+
+        // Fungsi untuk mencari Faktor Persekutuan Terbesar (FPB / GCD) untuk rasio
+        function gcd(a, b) {
+            return b === 0 ? a : gcd(b, a % b);
+        }
+
+        // Kalkulasi Resolusi Otomatis Berdasarkan Ukuran & DPI
+        function updateCalculations() {
+            const wCm = parseFloat(document.getElementById('physicalWidth').value) || 50;
+            const hCm = parseFloat(document.getElementById('physicalHeight').value) || 100;
+            const dpi = parseInt(document.getElementById('printDpi').value) || 300;
+            const scale = parseFloat(document.getElementById('aiScale').value) || 0.5;
+
+            const divisor = gcd(Math.round(wCm), Math.round(hCm));
+            const ratioW = Math.round(wCm) / divisor;
+            const ratioH = Math.round(hCm) / divisor;
+            const aspectStr = `${ratioW}:${ratioH}`;
+            document.getElementById('aspectRatio').value = aspectStr;
+
+            const wInch = wCm / 2.54;
+            const hInch = hCm / 2.54;
+
+            const finalW = Math.round(wInch * dpi);
+            const finalH = Math.round(hInch * dpi);
+
+            const aiW = Math.round(finalW * scale);
+            const aiH = Math.round(finalH * scale);
+
+            document.getElementById('calcSummaryText').innerText = 
+                `Format PNG HD | Ukuran: ${wCm}x${hCm} cm | Rasio: ${aspectStr} | Cetak: ${finalW} x ${finalH} px @${dpi} DPI | Canvas AI: ${aiW} x ${aiH} px`;
+
+            generatePrompt();
+        }
+
+        // Generator Prompt Utama
+        function generatePrompt() {
+            const productType = document.getElementById('productType').value;
+            const imageShape = document.getElementById('imageShape').value;
+            const wCm = document.getElementById('physicalWidth').value;
+            const hCm = document.getElementById('physicalHeight').value;
+            const dpi = document.getElementById('printDpi').value;
+            const scale = parseFloat(document.getElementById('aiScale').value);
+            const aspectStr = document.getElementById('aspectRatio').value;
+            
+            const wInch = wCm / 2.54;
+            const hInch = hCm / 2.54;
+            const finalW = Math.round(wInch * dpi);
+            const finalH = Math.round(hInch * dpi);
+            const aiW = Math.round(finalW * scale);
+            const aiH = Math.round(finalH * scale);
+
+            const domColor = document.getElementById('dominantColor').value;
+            const secColor = document.getElementById('secondaryColor').value;
+            
+            let mood = document.getElementById('colorMood').value;
+            const moodSel = document.getElementById('colorMoodSelect').value;
+            if (moodSel !== 'custom') mood = moodSel;
+
+            let style = document.getElementById('designStyle').value;
+            const styleSel = document.getElementById('designStyleSelect').value;
+            if (styleSel !== 'custom') style = styleSel;
+
+            const mainText = document.getElementById('mainText').value;
+            const textColor = document.getElementById('textColor').value;
+            const textPos = document.getElementById('textPosition').value;
+
+            const secondaryText = document.getElementById('secondaryText').value.trim();
+            const secondaryTextColor = document.getElementById('secondaryTextColor').value.trim();
+            const secondaryTextPosition = document.getElementById('secondaryTextPosition').value.trim();
+            
+            let fontStyle = document.getElementById('fontStyle').value;
+            const fontSel = document.getElementById('fontStyleSelect').value;
+            if (fontSel !== 'custom') fontStyle = fontSel;
+            
+            const strictText = document.getElementById('strictNoOtherText').checked;
+            const includeMenu = document.getElementById('includeMenuList').checked;
+            const aiFocusMode = document.getElementById('aiFocusMode').value;
+            const strictNoAiImage = document.getElementById('strictNoAiImage').checked;
+
+            // Ambil data menu (harga opsional)
+            let menuListText = '';
+            if (includeMenu) {
+                const rows = document.querySelectorAll('.menu-item-row');
+                let itemsArr = [];
+                rows.forEach(r => {
+                    const name = r.querySelector('.menu-name').value.trim();
+                    const price = r.querySelector('.menu-price').value.trim();
+                    if (name) {
+                        itemsArr.push(`- ${name}${price ? ': ' + price : ''}`);
+                    }
+                });
+                if (itemsArr.length > 0) {
+                    menuListText = `Tampilkan daftar menu berikut secara rapi dan terbaca:\n` + itemsArr.join('\n') + `\n`;
+                }
+            }
+
+            // Ambil data kontak & sosmed (alamat, telepon, ig, fb)
+            const address = document.getElementById('contactAddress').value.trim();
+            const phone = document.getElementById('contactPhone').value.trim();
+            const ig = document.getElementById('contactIg').value.trim();
+            const fb = document.getElementById('contactFb').value.trim();
+            
+            let contactText = '';
+            let cArr = [];
+            if (address) cArr.push(`Alamat: ${address}`);
+            if (phone) cArr.push(`Telepon/WA: ${phone}`);
+            if (ig) cArr.push(`Instagram: ${ig}`);
+            if (fb) cArr.push(`Facebook: ${fb}`);
+
+            if (cArr.length > 0) {
+                contactText = `Tampilkan informasi kontak berikut di bagian bawah secara rapi:\n` + cArr.join(' | ') + `\n`;
+            }
+
+            const visualObj = document.getElementById('visualObjects').value;
+            const qualityKw = document.getElementById('qualityKeywords').value;
+
+            // Instruksi Mode Fokus AI
+            let focusInstruction = '';
+            if (aiFocusMode === 'image_focus') {
+                focusInstruction = `FOKUS UTAMA AI: Utamakan kedetailan visual objek/gambar ilustrasi agar tampil sangat menonjol dan memukau.\n`;
+            } else if (aiFocusMode === 'text_focus') {
+                focusInstruction = `FOKUS UTAMA AI: Utamakan kejelasan tipografi dan keterbacaan teks utama agar sangat tajam dan mudah dibaca.\n`;
+            } else {
+                focusInstruction = `FOKUS UTAMA AI: Keseimbangan proporsional antara gambar objek dan teks promosi.\n`;
+            }
+
+            let visualInstruction = '';
+            if (strictNoAiImage) {
+                visualInstruction = `STRICT RULE: DILARANG KERAS menambahkan gambar ilustrasi AI, foto, karakter, atau objek visual apapun. HANYA buat layout background dan teks tipografi saja.\n`;
+            } else {
+                visualInstruction = `Elemen visual / gambar yang harus dimasukkan:\n${visualObj}\n`;
+            }
+
+            // Menyusun format prompt
+            let prompt = `Buatkan design ${productType} siap cetak dengan bentuk model gambar ${imageShape}.\n`;
+            prompt += `FORMAT PNG HD Ukuran fisik final: ${wCm} cm x ${hCm} cm.\n`;
+            prompt += `Aspect ratio final: ${aspectStr}.\n`;
+            prompt += `Resolusi cetak final: ${finalW} px x ${finalH} px pada ${dpi} DPI.\n\n`;
+
+            prompt += `Gunakan canvas/resolusi kerja AI tepat ${aiW} px x ${aiH} px.\n`;
+            prompt += `WAJIB mempertahankan aspect ratio ${aspectStr}.\n`;
+            prompt += `Jangan crop, jangan stretch, jangan mengubah proporsi canvas.\n\n`;
+
+            prompt += `Gunakan warna dominan ${domColor}, dan warna sekunder ${secColor}.\n`;
+            prompt += `Mood warna: ${mood}.\n`;
+            prompt += `Teks utama besar: ${mainText}\n`;
+            prompt += `Warna teks utama: ${textColor}\n`;
+            prompt += `Peletakan teks utama: ${textPos}.\n\n`;
+
+            if (secondaryText) {
+                prompt += `Teks sekunder / sub judul: ${secondaryText}\n`;
+                prompt += `Warna teks sekunder: ${secondaryTextColor}\n`;
+                prompt += `Peletakan teks sekunder: ${secondaryTextPosition}\n\n`;
+            }
+
+            if (menuListText) {
+                prompt += menuListText + `\n`;
+            }
+            if (contactText) {
+                prompt += contactText + `\n`;
+            }
+
+            if (strictText) {
+                prompt += `DILARANG menambahkan teks lain selain teks yang diberikan.\n`;
+            }
+
+            prompt += `\nGunakan gaya font ${fontStyle}.\n`;
+            prompt += focusInstruction;
+            prompt += visualInstruction + `\n`;
+            prompt += `Gaya design: ${style}.\n\n`;
+            prompt += `Buat layout yang rapi, menarik, mudah dibaca dari jauh, komposisi seimbang, warna kontras, dan cocok untuk kebutuhan promosi.\n\n`;
+            prompt += qualityKw;
+
+            const outputEl = document.getElementById('outputPromptText');
+            outputEl.innerText = prompt;
+            document.getElementById('charCount').innerText = `${prompt.length} karakter`;
+        }
+
+        // Preset Kuliner
+        function loadPreset(type) {
+            if (type === 'kuliner') {
+                document.getElementById('productType').value = "Banner";
+                document.getElementById('imageShape').value = "Kotak (Rectangle / Square)";
+                document.getElementById('physicalWidth').value = "50";
+                document.getElementById('physicalHeight').value = "100";
+                document.getElementById('dominantColor').value = "Kuning";
+                document.getElementById('secondaryColor').value = "Merah, hitam";
+                
+                document.getElementById('colorMoodSelect').value = "Cerah";
+                handleMoodSelectChange();
+                
+                document.getElementById('designStyleSelect').value = "Food Promotion Style";
+                handleDesignStyleSelectChange();
+
+                document.getElementById('mainText').value = "NASI PECEL, SAMBELAN";
+                document.getElementById('textColor').value = "Merah";
+                document.getElementById('textPosition').value = "Tengah, Atas";
+                
+                document.getElementById('secondaryText').value = "Rasa Mantap Harga Kaki Lima";
+                document.getElementById('secondaryTextColor').value = "Putih";
+                document.getElementById('secondaryTextPosition').value = "Di bawah teks utama";
+
+                document.getElementById('fontStyleSelect').value = "Tebal Modern";
+                handleFontStyleSelectChange();
+
+                document.getElementById('visualObjects').value = "tambahkan gambar nasi pecel dan sambelan dalam kemasan cup di bagian tengah, bawah. Gambar Jangan terlalu besar, jangan lebih besar dari teks utama";
+                
+                const container = document.getElementById('menuItemsContainer');
+                container.innerHTML = '';
+                addMenuItem('Nasi Pecel Special', 'Rp 15.000');
+                addMenuItem('Sambelan Klotok', 'Rp 12.000');
+                document.getElementById('includeMenuList').checked = true;
+
+                document.getElementById('contactAddress').value = "Jl. Raya Kuliner No. 88";
+                document.getElementById('contactPhone').value = "0812-9988-7766";
+                document.getElementById('contactIg').value = "@pecelnusantara";
+                document.getElementById('contactFb').value = "Pecel Nusantara Official";
+
+            } else if (type === 'event') {
+                document.getElementById('productType').value = "Flyer";
+                document.getElementById('imageShape').value = "Kotak (Rectangle / Square)";
+                document.getElementById('physicalWidth').value = "100";
+                document.getElementById('physicalHeight').value = "200";
+                document.getElementById('dominantColor').value = "Biru Elektrik";
+                document.getElementById('secondaryColor').value = "Putih, Kuning Emas";
+                
+                document.getElementById('colorMoodSelect').value = "Eksklusif & Profesional";
+                handleMoodSelectChange();
+
+                document.getElementById('designStyleSelect').value = "Modern Corporate Event Style";
+                handleDesignStyleSelectChange();
+
+                document.getElementById('mainText').value = "GRAND OPENING, PROMO SPESIAL";
+                document.getElementById('textColor').value = "Putih";
+                document.getElementById('textPosition').value = "Atas, Center";
+
+                document.getElementById('secondaryText').value = "Diskon hingga 50% untuk Semua Pengunjung";
+                document.getElementById('secondaryTextColor').value = "Kuning Emas";
+                document.getElementById('secondaryTextPosition').value = "Di bawah judul utama";
+                
+                document.getElementById('fontStyleSelect').value = "Futuristic Sans-Serif";
+                handleFontStyleSelectChange();
+
+                document.getElementById('visualObjects').value = "tambahkan gambar gift box dan ikon diskon 50% di bagian tengah";
+                
+                const container = document.getElementById('menuItemsContainer');
+                container.innerHTML = '';
+                document.getElementById('includeMenuList').checked = false;
+
+                document.getElementById('contactAddress').value = "Grand Ballroom City Center";
+                document.getElementById('contactPhone').value = "0821-1122-3344";
+                document.getElementById('contactIg').value = "@grandopening";
+                document.getElementById('contactFb').value = "Grand Opening Event";
+            }
+            updateCalculations();
+        }
+
+        // Reset Form
+        function resetForm() {
+            // Kosongkan ukuran fisik
+            document.getElementById('physicalWidth').value = "";
+            document.getElementById('physicalHeight').value = "";
+            
+            // Kosongkan warna & teks utama serta sekunder
+            document.getElementById('dominantColor').value = "";
+            document.getElementById('secondaryColor').value = "";
+            document.getElementById('colorMood').value = "";
+            document.getElementById('designStyle').value = "";
+            document.getElementById('mainText').value = "";
+            document.getElementById('textColor').value = "";
+            document.getElementById('textPosition').value = "";
+            
+            document.getElementById('secondaryText').value = "";
+            document.getElementById('secondaryTextColor').value = "";
+            document.getElementById('secondaryTextPosition').value = "";
+
+            document.getElementById('fontStyle').value = "";
+
+            // Kosongkan list menu
+            const container = document.getElementById('menuItemsContainer');
+            container.innerHTML = '';
+            document.getElementById('includeMenuList').checked = false;
+
+            // Kosongkan informasi kontak & sosmed
+            document.getElementById('contactAddress').value = "";
+            document.getElementById('contactPhone').value = "";
+            document.getElementById('contactIg').value = "";
+            document.getElementById('contactFb').value = "";
+
+            // Kosongkan objek visual / deskripsi
+            document.getElementById('visualObjects').value = "";
+            
+            document.getElementById('strictNoOtherText').checked = false;
+            document.getElementById('strictNoAiImage').checked = false;
+
+            updateCalculations();
+        }
+
+        // Salin Prompt ke Clipboard menggunakan execCommand (mendukung iFrame)
+        function copyPrompt() {
+            const text = document.getElementById('outputPromptText').innerText;
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast();
+            } catch (err) {
+                console.error('Gagal menyalin teks', err);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // Unduh sebagai file .txt
+        function downloadPrompt() {
+            const text = document.getElementById('outputPromptText').innerText;
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'AI_Banner_Prompt.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Tampilkan Toast Notifikasi
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 2000);
+        }
+
+        // Inisialisasi awal saat load
+        window.onload = function() {
+            updateCalculations();
+        };
+    </script>
+</body>
+</html>
